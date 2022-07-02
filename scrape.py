@@ -10,6 +10,7 @@ URL_PREFIX = 'https://configure.zsa.io/ergodox-ez/layouts/'
 URL_TEMPLATE = 'https://configure.zsa.io/ergodox-ez/layouts/{0}/latest'
 URL_EXAMPLE = URL_TEMPLATE.format('XXXXX')
 PAGE_LOAD_TIMEOUT = 10
+FILENAME = 'layout.png'
 
 # Argument parsing and validation
 def main():
@@ -56,18 +57,39 @@ def scrape(url):
 
         print('Waiting for page to load...')
 
+        # TODO: Choose a better element to screenshot.
+
         element = WebDriverWait(browser, timeout=PAGE_LOAD_TIMEOUT).until(lambda b: b.find_element(By.CLASS_NAME, 'frame'))
 
-        # TODO: Modify CSS.
-        # TODO: Take a screenshot.
+        # TODO: Modify CSS for cleaner image.
 
-        print(element.get_attribute('innerHTML'))
+        screenshot(browser, element)
+
+        # print(element.get_attribute('innerHTML'))
 
     finally:
         try:
             browser.close()
         except Exception as ex:
             print('Error: {0}'.format(ex))
+
+# Save image of element to disk
+def screenshot(browser, element):
+    from PIL import Image
+
+    location = element.location
+    size = element.size
+
+    browser.save_screenshot(FILENAME)
+
+    x0 = (int)(location['x'])
+    y0 = (int)(location['y'])
+    x1 = (int)(x0 + size['width'])
+    y1 = (int)(y0 + size['height'])
+
+    image = Image.open(FILENAME)
+    image = image.crop((x0, y0, x1, y1))
+    image = image.save(FILENAME)
 
 # Entry point
 if __name__ == '__main__':
