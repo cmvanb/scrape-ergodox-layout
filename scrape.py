@@ -31,19 +31,42 @@ def main():
 
         scrape(args.url)
 
-        print('success')
-        print(vars(args))
+        print('Scrape complete.')
 
     except Exception as ex:
-        print('error: {0}'.format(ex))
+        print('Error: {0}'.format(ex))
 
 # Program
 def scrape(url):
-    # from selenium import webdriver
-    #
-    # browser = webdriver.Firefox()
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
 
-    raise Exception('Not implemented.')
+    print('Scraping...')
+
+    try:
+        opts = webdriver.FirefoxOptions()
+        opts.add_argument('--headless')
+        opts.add_argument('--enable-javascript')
+
+        browser = webdriver.Firefox(options=opts)
+
+        browser.get(url)
+
+        print('Waiting for page to load...')
+
+        element = WebDriverWait(browser, timeout=10).until(lambda b: b.find_element(By.CLASS_NAME, 'frame'))
+
+        # TODO: Modify CSS.
+        # TODO: Take a screenshot.
+
+        print(element.get_attribute('innerHTML'))
+
+    finally:
+        try:
+            browser.close()
+        except Exception as ex:
+            print('Error: {0}'.format(ex))
 
 # Entry point
 if __name__ == '__main__':
