@@ -33,8 +33,6 @@ def main():
 
         scrape(args.url)
 
-        print('Scrape complete.')
-
     except Exception as ex:
         print('Error: {0}'.format(ex))
 
@@ -43,8 +41,6 @@ def scrape(url):
     from selenium import webdriver
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
-
-    print('Scraping...')
 
     try:
         opts = webdriver.FirefoxOptions()
