@@ -11,6 +11,8 @@ URL_TEMPLATE = 'https://configure.zsa.io/ergodox-ez/layouts/{0}/latest'
 URL_EXAMPLE = URL_TEMPLATE.format('XXXXX')
 PAGE_LOAD_TIMEOUT = 10
 FILENAME = 'layout.png'
+TARGET_ELEMENT = 'ergodox'
+EXTRA_HEIGHT = 20
 
 # Argument parsing and validation
 def main():
@@ -20,6 +22,7 @@ def main():
     try:
         parser = argparse.ArgumentParser(description='Scrape ZSA ergodox layout')
         parser.add_argument('url', help='The URL for your layout. Must look like: \'{0}\'. Append /X to select layer.'.format(URL_EXAMPLE))
+        parser.add_argument('--hide-logo', action='store_true', help='Hide the EZ logo.')
 
         args = parser.parse_args()
 
@@ -31,33 +34,51 @@ def main():
             or not args.url.startswith(URL_PREFIX)):
             raise Exception('URL must look like: \'{0}\''.format(URL_EXAMPLE))
 
-        scrape(args.url)
+        scrape(args.url, args.hide_logo)
 
     except Exception as ex:
         print('Error: {0}'.format(ex))
 
 # Program
-def scrape(url):
+def scrape(url, hide_logo):
+    import os
+    import time
     from selenium import webdriver
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
 
     try:
+        # NOTE: Using this sad hack because the --width and --height arguments
+        # don't work in headless mode on Firefox.
+        os.environ['MOZ_HEADLESS_WIDTH'] = '1920'
+        os.environ['MOZ_HEADLESS_HEIGHT'] = '1080'
+
         opts = webdriver.FirefoxOptions()
         opts.add_argument('--headless')
         opts.add_argument('--enable-javascript')
 
         browser = webdriver.Firefox(options=opts)
+        browser.maximize_window()
 
         browser.get(url)
 
         print('Waiting for page to load...')
 
-        # TODO: Choose a better element to screenshot.
+        element = WebDriverWait(browser, timeout=PAGE_LOAD_TIMEOUT).until(lambda b: b.find_element(By.CLASS_NAME, TARGET_ELEMENT))
 
-        element = WebDriverWait(browser, timeout=PAGE_LOAD_TIMEOUT).until(lambda b: b.find_element(By.CLASS_NAME, 'frame'))
+        # Selenium scrolls down for some reason.
+        browser.execute_script('window.scrollTo(0, 0)')
+        time.sleep(0.5)
 
         # TODO: Modify CSS for cleaner image.
+
+        if hide_logo:
+            logo = browser.find_element(By.CLASS_NAME, 'logo')
+            # browser.execute_script('arguments[0].style.visibility = \'hidden\';', logo)
+            # This change is reflected in the print output, but not in the saved image. Maddening.
+            browser.execute_script('arguments[0].style.border = \'2px solid red\';', logo)
+            time.sleep(0.5)
+            print(logo.value_of_css_property('border'))
 
         screenshot(browser, element)
 
@@ -77,14 +98,18 @@ def screenshot(browser, element):
         location = element.location
         size = element.size
 
-        browser.save_screenshot(FILENAME)
+        browser.save_screenshot('full.png')
 
         x0 = (int)(location['x'])
         y0 = (int)(location['y'])
         x1 = (int)(x0 + size['width'])
-        y1 = (int)(y0 + size['height'])
+        # Extra height is needed because the visual element extends outside the
+        # element's reported borders.
+        y1 = (int)(y0 + size['height'] + EXTRA_HEIGHT)
 
-        image = Image.open(FILENAME)
+        print('{0}, {1}, {2}, {3}'.format(x0, y0, x1, y1))
+
+        image = Image.open('full.png')
         image = image.crop((x0, y0, x1, y1))
         image = image.save(FILENAME)
 
