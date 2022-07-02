@@ -9,6 +9,7 @@
 URL_PREFIX = 'https://configure.zsa.io/ergodox-ez/layouts/'
 URL_TEMPLATE = 'https://configure.zsa.io/ergodox-ez/layouts/{0}/latest'
 URL_EXAMPLE = URL_TEMPLATE.format('XXXXX')
+PAGE_LOAD_TIMEOUT = 10
 
 # Argument parsing and validation
 def main():
@@ -55,7 +56,7 @@ def scrape(url):
 
         print('Waiting for page to load...')
 
-        element = WebDriverWait(browser, timeout=10).until(lambda b: b.find_element(By.CLASS_NAME, 'frame'))
+        element = WebDriverWait(browser, timeout=PAGE_LOAD_TIMEOUT).until(lambda b: b.find_element(By.CLASS_NAME, 'frame'))
 
         # TODO: Modify CSS.
         # TODO: Take a screenshot.
