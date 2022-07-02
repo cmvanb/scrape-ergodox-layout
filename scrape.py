@@ -77,19 +77,26 @@ def scrape(url):
 def screenshot(browser, element):
     from PIL import Image
 
-    location = element.location
-    size = element.size
+    try:
+        location = element.location
+        size = element.size
 
-    browser.save_screenshot(FILENAME)
+        browser.save_screenshot(FILENAME)
 
-    x0 = (int)(location['x'])
-    y0 = (int)(location['y'])
-    x1 = (int)(x0 + size['width'])
-    y1 = (int)(y0 + size['height'])
+        x0 = (int)(location['x'])
+        y0 = (int)(location['y'])
+        x1 = (int)(x0 + size['width'])
+        y1 = (int)(y0 + size['height'])
 
-    image = Image.open(FILENAME)
-    image = image.crop((x0, y0, x1, y1))
-    image = image.save(FILENAME)
+        image = Image.open(FILENAME)
+        image = image.crop((x0, y0, x1, y1))
+        image = image.save(FILENAME)
+
+        # TODO: Include path.
+        print('Image saved to: {0}'.format(FILENAME))
+
+    except Exception as ex:
+        print('Error: {0}'.format(ex))
 
 # Entry point
 if __name__ == '__main__':
