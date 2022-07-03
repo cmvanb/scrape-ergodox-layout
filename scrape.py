@@ -25,6 +25,7 @@ def main():
         parser.add_argument('--hide-logo', action='store_true', help='Hide the EZ logo.')
         parser.add_argument('--hide-none-icon', action='store_true', help='Hide the \'none\' icon.')
         parser.add_argument('--hide-mod-color', action='store_true', help='Hide the colored background on modifer keys.')
+        parser.add_argument('--darken-key-outlines', action='store_true', help='Darken the key outlines (useful for printing).')
 
         args = parser.parse_args()
 
@@ -46,6 +47,7 @@ def scrape(args):
     import os
     import time
     from selenium import webdriver
+    from selenium.common.exceptions import TimeoutException
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
 
@@ -53,6 +55,7 @@ def scrape(args):
     hide_logo = args.hide_logo
     hide_none_icon = args.hide_none_icon
     hide_mod_color = args.hide_mod_color
+    darken_key_outlines = args.darken_key_outlines
 
     try:
         # NOTE: Using this sad hack because the --width and --height arguments
@@ -83,16 +86,23 @@ def scrape(args):
             time.sleep(0.5)
 
         if hide_none_icon:
-            browser.execute_script('document.styleSheets[1].insertRule(".icon-none:before { content: none !important; border: 2px solid red; }")')
+            browser.execute_script('document.styleSheets[1].insertRule(".icon-none:before { content: none !important; }")')
             time.sleep(0.5)
 
         if hide_mod_color:
-            # TODO: Implement.
+            browser.execute_script('document.styleSheets[1].insertRule(".key.modifier { background-color: rgba(0, 0, 0, 0) !important; }")')
+            time.sleep(0.5)
+
+        if darken_key_outlines:
+            browser.execute_script('document.styleSheets[1].insertRule(".key { border: 1px solid black !important; }")')
             time.sleep(0.5)
 
         # input('press ENTER to continue')
 
         screenshot(browser, element)
+
+    except TimeoutException:
+        print ('Page loading timed out after {0} seconds. Target element \'{1}\' was not found. Please check whether you have a valid ZSA URL.'.format(PAGE_LOAD_TIMEOUT, TARGET_ELEMENT))
 
     finally:
         try:
