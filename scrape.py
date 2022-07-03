@@ -100,8 +100,6 @@ def scrape(args):
             browser.execute_script('document.styleSheets[1].insertRule(".key { border: 1px solid black !important; }")')
             time.sleep(JAVASCRIPT_EXECUTION_TIME)
 
-        # input('press ENTER to continue')
-
         screenshot(browser, element)
 
     except TimeoutException:
@@ -136,7 +134,6 @@ def screenshot(browser, element):
 
         os.remove(temp_filename)
 
-        # TODO: Include path.
         print('Image saved to: {0}'.format(OUTPUT_FILENAME))
 
     except Exception as ex:
