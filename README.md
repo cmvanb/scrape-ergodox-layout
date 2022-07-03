@@ -15,8 +15,16 @@ Scrapes the ZSA ergodox layout tool to generate a printable layout.
 This script has only been tested on Arch Linux, with Firefox version `102.0`, Python version `3.10.5` and geckodriver version `0.30.0`.
 
 ## Usage:
-`python scrape.py <URL>`  
+```
+python scrape.py [--hide-logo] [--hide-none-icon] [--hide-mod-color] [--darken-key-outlines] url
 
-Your `<URL>` should look like this: `https://configure.zsa.io/ergodox-ez/layouts/XXX/latest`  
-Append /X to select the layer you want to scrape; it will scrape the 0th layer by default.  
+arguments:
+  url                   The URL for your layout. Must look like: 'https://configure.zsa.io/ergodox-ez/layouts/XXXXX', where X is
+                        alphanumeric. Append '/latest/[0-9]' to select layer.
 
+options:
+  --hide-logo           Hide the EZ logo.
+  --hide-none-icon      Hide the 'none' icon.
+  --hide-mod-color      Hide the colored background on modifer keys.
+  --darken-key-outlines Darken the key outlines (useful for printing).
+```
