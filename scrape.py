@@ -6,9 +6,9 @@
 # ------------------------------------------------------------------------------
 
 # Constants
-URL_PREFIX = 'https://configure.zsa.io/ergodox-ez/layouts/'
-URL_TEMPLATE = 'https://configure.zsa.io/ergodox-ez/layouts/{0}/latest'
-URL_EXAMPLE = URL_TEMPLATE.format('XXXXX')
+URL_TEMPLATE = 'https://configure.zsa.io/ergodox-ez/layouts/{0}'
+URL_MINIMUM = URL_TEMPLATE.format('XXXXX')
+URL_REGEX = '^https://configure.zsa.io/ergodox-ez/layouts/[A-Za-z0-9]{5,5}/?'
 PAGE_LOAD_TIMEOUT = 10 # Seconds
 OUTPUT_FILENAME = 'layout.png'
 TARGET_ELEMENT = 'ergodox'
@@ -19,10 +19,12 @@ JAVASCRIPT_EXECUTION_TIME = 0.5
 def main():
     import argparse
     import validators
+    import re
+    import sys
 
     try:
         parser = argparse.ArgumentParser(description='Scrape ZSA ergodox layout')
-        parser.add_argument('url', help='The URL for your layout. Must look like: \'{0}\'. Append /X to select layer.'.format(URL_EXAMPLE))
+        parser.add_argument('url', help='The URL for your layout. Must look like: \'{0}\', where X is alphanumeric. Append \'/latest/[0-9]\' to select layer.'.format(URL_MINIMUM))
         parser.add_argument('--hide-logo', action='store_true', help='Hide the EZ logo.')
         parser.add_argument('--hide-none-icon', action='store_true', help='Hide the \'none\' icon.')
         parser.add_argument('--hide-mod-color', action='store_true', help='Hide the colored background on modifer keys.')
@@ -33,13 +35,13 @@ def main():
         if not validators.url(args.url):
             raise Exception('URL provided is malformed.')
 
-        # TODO: Use regex to validate the full URL
-        if (len(args.url) < len(URL_EXAMPLE)
-            or not args.url.startswith(URL_PREFIX)):
-            raise Exception('URL must look like: \'{0}\''.format(URL_EXAMPLE))
+        if (len(args.url) < len(URL_MINIMUM)
+            or re.search(URL_REGEX, args.url) == None):
+            raise Exception('URL must look like: \'{0}\', where X is alphanumeric. Append \'/latest/[0-9]\' to select layer.'.format(URL_MINIMUM))
 
     except Exception as ex:
         print('Error: {0}'.format(ex))
+        sys.exit(1)
 
     scrape(args)
 
