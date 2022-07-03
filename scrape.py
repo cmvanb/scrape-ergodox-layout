@@ -13,6 +13,7 @@ PAGE_LOAD_TIMEOUT = 10 # Seconds
 OUTPUT_FILENAME = 'layout.png'
 TARGET_ELEMENT = 'ergodox'
 EXTRA_HEIGHT = 20 # Pixels
+JAVASCRIPT_EXECUTION_TIME = 0.5
 
 # Argument parsing and validation
 def main():
@@ -78,24 +79,24 @@ def scrape(args):
 
         # Selenium scrolls down for some reason.
         browser.execute_script('window.scrollTo(0, 0)')
-        time.sleep(0.5)
+        time.sleep(JAVASCRIPT_EXECUTION_TIME)
 
         if hide_logo:
             logo = browser.find_element(By.XPATH, '//div[@class=\'ergodox\']/div[@class=\'logo\']')
             browser.execute_script('arguments[0].style.visibility = \'hidden\';', logo)
-            time.sleep(0.5)
+            time.sleep(JAVASCRIPT_EXECUTION_TIME)
 
         if hide_none_icon:
             browser.execute_script('document.styleSheets[1].insertRule(".icon-none:before { content: none !important; }")')
-            time.sleep(0.5)
+            time.sleep(JAVASCRIPT_EXECUTION_TIME)
 
         if hide_mod_color:
             browser.execute_script('document.styleSheets[1].insertRule(".key.modifier { background-color: rgba(0, 0, 0, 0) !important; }")')
-            time.sleep(0.5)
+            time.sleep(JAVASCRIPT_EXECUTION_TIME)
 
         if darken_key_outlines:
             browser.execute_script('document.styleSheets[1].insertRule(".key { border: 1px solid black !important; }")')
-            time.sleep(0.5)
+            time.sleep(JAVASCRIPT_EXECUTION_TIME)
 
         # input('press ENTER to continue')
 
