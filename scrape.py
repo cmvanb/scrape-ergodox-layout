@@ -95,6 +95,8 @@ def scrape(args):
         if hide_mod_color:
             browser.execute_script('document.styleSheets[1].insertRule(".key.modifier { background-color: rgba(0, 0, 0, 0) !important; }")')
             time.sleep(JAVASCRIPT_EXECUTION_TIME)
+            browser.execute_script('document.styleSheets[1].insertRule(".key.magic { background-color: rgba(0, 0, 0, 0) !important; }")')
+            time.sleep(JAVASCRIPT_EXECUTION_TIME)
 
         if darken_key_outlines:
             browser.execute_script('document.styleSheets[1].insertRule(".key { border: 1px solid black !important; }")')
