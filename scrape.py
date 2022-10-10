@@ -52,13 +52,14 @@ def scrape(args):
     from selenium import webdriver
     from selenium.common.exceptions import TimeoutException
     from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support.wait import WebDriverWait
 
     url = args.url
     hide_logo = args.hide_logo
     hide_none_icon = args.hide_none_icon
     hide_mod_color = args.hide_mod_color
     darken_key_outlines = args.darken_key_outlines
+    browser = None
 
     try:
         # NOTE: Using this sad hack because the --width and --height arguments
@@ -105,11 +106,12 @@ def scrape(args):
         screenshot(browser, element)
 
     except TimeoutException:
-        print ('Page loading timed out after {0} seconds. Target element \'{1}\' was not found. Please check whether you have a valid ZSA URL.'.format(PAGE_LOAD_TIMEOUT, TARGET_ELEMENT))
+        print ('Page load timed out after {0} seconds. Target element \'{1}\' was not found. Please check whether you have a valid ZSA URL.'.format(PAGE_LOAD_TIMEOUT, TARGET_ELEMENT))
 
     finally:
         try:
-            browser.close()
+            if not browser is None:
+                browser.close()
         except Exception as ex:
             raise Exception from ex
 
